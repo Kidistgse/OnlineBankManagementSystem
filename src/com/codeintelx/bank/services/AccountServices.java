@@ -2,99 +2,90 @@ package com.codeintelx.bank.services;
 
 
 import com.codeintelx.bank.models.Account;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+
+import java.util.*;
 
 
 public class AccountServices {
-    Scanner input = new Scanner(System.in);
-    List<Account> customer = new ArrayList<>();
+    public  Map<String, Account> customerinfo = new HashMap<>();
 
-    public void createAccount(int accountID, String accountName, String accountType, double accountBalance )
+    public Account createAccount(String accountName, String accountType, double accountBalance )
     {
     // collect user information: generate account number, collect account type, account name.
+        Random rand = new Random();
+       // int accountID = rand.nextInt(1000);
+        UUID uuid = UUID.randomUUID();
+        String accountID = Long.toString(uuid.getMostSignificantBits()).substring(0,11).replace("-","");
 
-        customer.add(new Account(accountID,accountName,accountType,accountBalance));
-        //customer.get(0).getAccountBalance();
-
+     Account user = (new Account(accountName,accountType,accountBalance));
+     customerinfo.put(accountID, user);
+         System.out.println("account successfully created: here is your account Id "+accountID);
+         //display(user);
+        return user;
     }
     public int accountSize()
     {
-        return customer.size();
-    }
-    public int searchAccount(int accountID)
+
+        return customerinfo.size();
+     }
+    public Account searchAccount(String accountID)
     {
-        //int accountIndex=0;
-        System.out.println(customer.size());
-        for(int i=0; i<customer.size(); i++)
+        for(int i=0; i<customerinfo.size(); i++)
         {
-            if(customer.get(i).getAccountID() == accountID)
+            if(customerinfo.containsKey(accountID))
             {
-                int accountIndex =i;
-                return accountIndex;
-            }
-
-               
+            return customerinfo.get(accountID);
+           }
         }
-        return 0;
+        return null;
     }
-    public void viewAccount(int AccountID)
-    {
-    //System.out.println("View account list size: "+customer.size());
-        int accountIndex=0;
-     //   System.out.println("you made it to view acount account index before searchaccount is executd"+accountIndex);
+    private Account viewAccount(String AccountID) {
+        //  int accountIndex;
 
-        accountIndex  = searchAccount(AccountID);
-        display(accountIndex);
+        Account user;
+        user = searchAccount(AccountID);
+        if (user == null) {
+            System.out.println("account does not exist");
+            return null;
+        }
+        else {
+            return user;
+        }
+
     }
-//    public  boolean search (String accountID, int accountindex)
-//    {
-//
-//        if(customer.get(accountindex).getAccountID().contains(accountID))
-//            {
-//                System.out.println("1");
-//               return true;
-//            }
-//            return false;
-//    }
-    public   void withdrawMoney(double withdrawlAmount, int accountID)
+
+    public   void withdrawMoney(double withdrawlAmount, String accountID)
     {
         //call account, get account balance and subtract withdral amount, return new account balance to account information and as an output;
-        int accountIndex =0;
-        accountIndex=searchAccount(accountID);
-        double acountBalance = customer.get(accountIndex).getAccountBalance();
+        Account user ;
+        System.out.println("hey");
+        user=searchAccount(accountID);
+        double acountBalance = user.getAccountBalance();
         acountBalance = acountBalance - withdrawlAmount;
-        while (acountBalance<0) {
-            System.out.println("insufficient funds: can not excute transaction"+'\n'+ "current balance: "+customer.get(accountIndex).getAccountBalance());
+        if(acountBalance<0) {
+            System.out.println("insufficient funds: can not execute transaction"+'\n'+ "withdraw Limit: "+user.getAccountBalance());
+        }
+        else {
+            user.setAccountBalance(acountBalance);
+            System.out.println("withdraw ammount: $" + withdrawlAmount + " new balance: $" +
+                    user.getAccountBalance());
         }
 
-
-            customer.get(accountIndex).setAccountBalance(acountBalance);
-            System.out.println("withdraw ammount: $" + withdrawlAmount + " new balance: $" +
-                    customer.get(accountIndex).getAccountBalance());
-
-
     }
-    public   void depositMoney(double depositAmount, int accountID)
+    public   void depositMoney(double depositAmount, String accountID)
     {
         //call account, get account balance and add deposit amount, return new account balance to account information  as an output;
-        int accountIndex =0;
-        accountIndex=searchAccount(accountID);
-        double acountBalance = customer.get(accountIndex).getAccountBalance();
+        Account user;
+        user=searchAccount(accountID);
+        System.out.println(user.getAccountBalance());
+        double acountBalance = user.getAccountBalance();
         acountBalance = acountBalance + depositAmount;
-        customer.get(accountIndex).setAccountBalance(acountBalance);
-        System.out.println("deposit ammount "+depositAmount+" new balance: "+customer.get(accountIndex).getAccountBalance());
+        user.setAccountBalance(acountBalance);
+        System.out.println("deposit ammount "+depositAmount+" new balance: "+user.getAccountBalance());
     }
-    public  void display( int accountIndex)
-    {
-        //List<Account> customer = new ArrayList<>();
-
-        System.out.println("Account ID:"+customer.get(accountIndex).getAccountID());
-        System.out.println("Account Name:"+customer.get(accountIndex).getAccountname());
-        System.out.println("Account Type:"+customer.get(accountIndex).getAccountType());
-        System.out.println("Account Balance:"+customer.get(accountIndex).getAccountBalance());
-
+    
+    public void cancelation (String accountID) {
+       System.out.println("your account has been successfully canceled "+customerinfo.remove(accountID).getAccountname());
 
     }
 

@@ -5,9 +5,9 @@ public class Account {
     String accountname="0";
     String accountType="0";
     double accountBalance=0;
-   public Account(int accountID, String name, String accountType, double accountBalance )
+   public Account(String name, String accountType, double accountBalance )
     {
-        this.accountID = accountID;
+        // this.accountID = accountID;
         this.accountname = name;
         this.accountType = accountType;
         this.accountBalance=accountBalance;
