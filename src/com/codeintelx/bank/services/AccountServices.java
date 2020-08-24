@@ -1,93 +1,85 @@
 package com.codeintelx.bank.services;
 
 
+import com.codeintelx.bank.LowBalance;
 import com.codeintelx.bank.models.Account;
 
 import java.util.*;
 
 
 public class AccountServices {
-    public  Map<String, Account> customerinfo = new HashMap<>();
+    private   Map<String, Account> customerAccounts = new HashMap<>();
+    Account user ;
 
     public Account createAccount(String accountName, String accountType, double accountBalance )
     {
     // collect user information: generate account number, collect account type, account name.
-        Random rand = new Random();
-       // int accountID = rand.nextInt(1000);
         UUID uuid = UUID.randomUUID();
         String accountID = Long.toString(uuid.getMostSignificantBits()).substring(0,11).replace("-","");
 
-     Account user = (new Account(accountName,accountType,accountBalance));
-     customerinfo.put(accountID, user);
-         System.out.println("account successfully created: here is your account Id "+accountID);
-         //display(user);
-        return user;
-    }
-    public int accountSize()
-    {
+      user = (new Account(accountID,accountName,accountType,accountBalance));
 
-        return customerinfo.size();
-     }
-    public Account searchAccount(String accountID)
-    {
-        for(int i=0; i<customerinfo.size(); i++)
-        {
-            if(customerinfo.containsKey(accountID))
-            {
-            return customerinfo.get(accountID);
-           }
-        }
-        return null;
-    }
-    private Account viewAccount(String AccountID) {
-        //  int accountIndex;
+     customerAccounts.put(accountID, user);
 
+         return user;
+    }
+
+   public boolean checkIfAccountExist(String accountID)
+   {
+          // throws an exception if account does not exist
+          // caught inside of main class
+
+         return customerAccounts.containsKey(accountID);
+   }
+
+    public Account viewAccount(String accountID) throws AccountDoesnotexist  {
+        // Do not return null - just check it later
         Account user;
-        user = searchAccount(AccountID);
-        if (user == null) {
-            System.out.println("account does not exist");
-            return null;
-        }
-        else {
-            return user;
-        }
+            if (!customerAccounts.containsKey(accountID)) {
+                  throw new AccountDoesnotexist();
+                //when a user account does not exist it should throw a user account exception
+            } else {
+                return customerAccounts.get(accountID);
+         }
 
     }
 
-    public   void withdrawMoney(double withdrawlAmount, String accountID)
+    public   Account withdrawMoney(double withdrawlAmount, String accountID) throws LowBalance
     {
         //call account, get account balance and subtract withdral amount, return new account balance to account information and as an output;
-        Account user ;
-        System.out.println("hey");
-        user=searchAccount(accountID);
-        double acountBalance = user.getAccountBalance();
-        acountBalance = acountBalance - withdrawlAmount;
-        if(acountBalance<0) {
-            System.out.println("insufficient funds: can not execute transaction"+'\n'+ "withdraw Limit: "+user.getAccountBalance());
-        }
-        else {
-            user.setAccountBalance(acountBalance);
-            System.out.println("withdraw ammount: $" + withdrawlAmount + " new balance: $" +
-                    user.getAccountBalance());
-        }
+        //return account object
+        
+        double acountBalance = customerAccounts.get(accountID).getAccountBalance()-withdrawlAmount;
+        //acountBalance = acountBalance - withdrawlAmount;
 
+            if (acountBalance < 0) {
+                // insufficient fund exception
+               throw new LowBalance();
+            }
+
+            customerAccounts.get(accountID).getAccountBalance();
+            return user;
     }
-    public   void depositMoney(double depositAmount, String accountID)
+    public   Account depositMoney(double depositAmount, String accountID)
     {
         //call account, get account balance and add deposit amount, return new account balance to account information  as an output;
-        Account user;
-        user=searchAccount(accountID);
-        System.out.println(user.getAccountBalance());
-        double acountBalance = user.getAccountBalance();
+        // return account object
+
+
+        double acountBalance = customerAccounts.get(accountID).getAccountBalance();
         acountBalance = acountBalance + depositAmount;
-        user.setAccountBalance(acountBalance);
-        System.out.println("deposit ammount "+depositAmount+" new balance: "+user.getAccountBalance());
+        customerAccounts.get(accountID).setAccountBalance(acountBalance);
+        return user;
     }
     
-    public void cancelation (String accountID) {
-       System.out.println("your account has been successfully canceled "+customerinfo.remove(accountID).getAccountname());
+    public Account closeAccount (String accountID) {
+        //no prints
+       return customerAccounts.remove(accountID);
 
     }
+    //
 
 
+    public static class AccountDoestExist {
+    }
 }
